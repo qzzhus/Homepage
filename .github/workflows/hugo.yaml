@@ -30,11 +30,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install Go for Hugo Modules
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          cache: false
       - name: Install Hugo CLI
         run: |
           curl --fail --location --output "${RUNNER_TEMP}/hugo.deb" \
             "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
           sudo dpkg -i "${RUNNER_TEMP}/hugo.deb"
+      - name: Download locked theme module
+        run: go mod download
       - name: Install Chrome for CV rendering
         id: chrome
         uses: browser-actions/setup-chrome@v2
