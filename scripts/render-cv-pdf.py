@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from urllib.request import urlopen
@@ -12,6 +13,7 @@ root = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--url', default='http://localhost:1313/cv/', help='URL of the running CV preview')
 parser.add_argument('--browser', help='Path to a Chromium or Chrome executable')
+parser.add_argument('--no-sandbox', action='store_true', help='Disable the Chrome sandbox for the trusted local CV build in CI')
 args = parser.parse_args()
 
 candidates = [
@@ -47,11 +49,16 @@ with tempfile.TemporaryDirectory(prefix='cv-pdf-', dir=root / 'tmp') as temporar
         '--virtual-time-budget=2000',
         f'--user-data-dir={temporary / "browser-profile"}',
         f'--print-to-pdf={rendered}',
-        args.url,
     ]
-    with (root / 'out/cv-pdf-render.log').open('w') as log:
+    if args.no_sandbox:
+        command.extend(['--no-sandbox', '--disable-dev-shm-usage'])
+    command.append(args.url)
+    log_path = root / 'out/cv-pdf-render.log'
+    print(f'Rendering CV with {browser}', flush=True)
+    with log_path.open('w') as log:
         process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)
         deadline = time.monotonic() + 20
+        deadline_expired = False
         try:
             while time.monotonic() < deadline:
                 if rendered.is_file() and rendered.read_bytes().rstrip().endswith(b'%%EOF'):
@@ -59,6 +66,8 @@ with tempfile.TemporaryDirectory(prefix='cv-pdf-', dir=root / 'tmp') as temporar
                 if process.poll() is not None:
                     break
                 time.sleep(0.1)
+            else:
+                deadline_expired = True
         finally:
             # Some macOS Chromium builds remain open after writing the PDF.
             if process.poll() is None:
@@ -69,6 +78,15 @@ with tempfile.TemporaryDirectory(prefix='cv-pdf-', dir=root / 'tmp') as temporar
                     process.kill()
                     process.wait()
     if not rendered.is_file() or not rendered.read_bytes().rstrip().endswith(b'%%EOF'):
-        raise SystemExit('Chromium did not produce a complete PDF. See out/cv-pdf-render.log.')
+        if deadline_expired:
+            reason = 'Chrome did not finish writing the PDF before the deadline.'
+        elif process.returncode is not None and process.returncode < 0:
+            reason = f'Chrome exited on signal {-process.returncode}.'
+        else:
+            reason = f'Chrome exited with code {process.returncode}.'
+        print(reason, file=sys.stderr)
+        print('Chrome output (last 60 lines):', file=sys.stderr)
+        print('\n'.join(log_path.read_text(errors='replace').splitlines()[-60:]), file=sys.stderr)
+        raise SystemExit('Chromium did not produce a complete PDF. Full log: out/cv-pdf-render.log.')
     shutil.copyfile(rendered, output)
 print(f'Generated {output.relative_to(root)} ({output.stat().st_size:,} bytes).')

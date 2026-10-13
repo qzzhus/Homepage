@@ -45,6 +45,9 @@ pdf_arguments=(--url "${preview_url}cv/")
 if [[ -n "${CV_BROWSER:-}" ]]; then
   pdf_arguments+=(--browser "$CV_BROWSER")
 fi
+if [[ "${CV_BROWSER_NO_SANDBOX:-0}" == 1 ]]; then
+  pdf_arguments+=(--no-sandbox)
+fi
 python3 scripts/render-cv-pdf.py "${pdf_arguments[@]}"
 
 hugo --gc --minify --cleanDestinationDir \
