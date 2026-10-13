@@ -1,0 +1,45 @@
+{{- $script := .Page.Resources.GetMatch "hopfield.js" -}}
+{{- $patterns := slice (.Page.Resources.GetMatch "pattern1.png") (.Page.Resources.GetMatch "pattern2-binary.png") -}}
+{{- $urls := slice -}}
+{{- range $patterns -}}
+  {{- $urls = $urls | append .RelPermalink -}}
+{{- end -}}
+<section class="hopfield-demo" aria-label="Interactive Hopfield model simulation" data-patterns="{{ $urls | jsonify }}">
+  <div class="hopfield-grid">
+    <figure class="hopfield-figure">
+      <canvas id="hopfield-canvas" width="256" height="256" role="img" aria-label="Evolving Hopfield spin configuration"></canvas>
+      <figcaption><span class="spin-key"></span> +1 <span class="spin-key spin-key-down"></span> −1 · 256 × 256 spins</figcaption>
+    </figure>
+    <div class="hopfield-panel">
+      <p class="hopfield-label">HEAT-BATH SIMULATION</p>
+      <label class="hopfield-temperature" for="hopfield-temperature">Temperature <span>T/J = <output id="hopfield-temperature-value" for="hopfield-temperature">0.60</output></span></label>
+      <input id="hopfield-temperature" type="range" min="0.01" max="4.00" step="0.01" value="0.60">
+      <div class="hopfield-range"><span>0.01</span><span>4.00</span></div>
+      <p class="hopfield-help">Lower the temperature to retrieve either stored pattern. Randomize to try again.</p>
+      <div class="hopfield-controls" role="group" aria-label="Simulation controls">
+        <button id="hopfield-pause" type="button" disabled>Pause</button>
+        <button id="hopfield-step" type="button" disabled>Step</button>
+        <button id="hopfield-randomize" type="button" disabled>Randomize</button>
+      </div>
+      <dl class="hopfield-metrics">
+        {{- range $index, $pattern := $patterns }}
+        {{- $number := add $index 1 }}
+        <div><dt>Pattern {{ $number }} overlap</dt><dd><output id="hopfield-overlap-{{ $number }}" data-overlap>—</output></dd></div>
+        {{- end }}
+        <div><dt>Monte Carlo sweeps</dt><dd><output id="hopfield-sweeps">0</output></dd></div>
+      </dl>
+      <div class="hopfield-patterns">
+        {{- range $index, $pattern := $patterns }}
+        {{- $number := add $index 1 }}
+        <div class="hopfield-pattern">
+          <img src="{{ $pattern.RelPermalink }}" alt="Stored binary pattern {{ $number }}" width="72" height="72">
+          <p>Pattern {{ $number }}<br><span>Stored image or its inverse.</span></p>
+        </div>
+        {{- end }}
+      </div>
+      <p id="hopfield-status" class="hopfield-status" role="status">Loading both stored patterns…</p>
+    </div>
+  </div>
+  <noscript>Enable JavaScript to run the interactive simulation.</noscript>
+</section>
+<script defer src="{{ $script.RelPermalink }}"></script>

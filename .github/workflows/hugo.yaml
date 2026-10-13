@@ -1,0 +1,73 @@
+name: Build CV PDF and deploy Hugo site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Generate CV PDF and build site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      HUGO_VERSION: 0.167.0
+      HUGO_ENVIRONMENT: production
+      TZ: Asia/Tokyo
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Hugo CLI
+        run: |
+          curl --fail --location --output "${RUNNER_TEMP}/hugo.deb" \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i "${RUNNER_TEMP}/hugo.deb"
+      - name: Install Chrome for CV rendering
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+          install-dependencies: true
+      - name: Read GitHub Pages URL
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Generate CV PDF and build Hugo site
+        env:
+          CV_BROWSER: ${{ steps.chrome.outputs.chrome-path }}
+          PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: bash scripts/build-site.sh "$PAGES_BASE_URL"
+      - name: Upload generated CV PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: curriculum-vitae
+          path: static/downloads/curriculum-vitae.pdf
+          if-no-files-found: error
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    name: Deploy built site to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

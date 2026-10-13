@@ -1,0 +1,22 @@
+{{- define "main" }}
+<div class="home-profile">
+  {{- partial "index_profile.html" . }}
+  {{- $featured := where site.RegularPages "Params.featured" true -}}
+  {{- with $featured }}
+  <section class="home-featured" aria-labelledby="featured-title">
+    <h2 id="featured-title">Featured</h2>
+    {{- range .ByDate.Reverse }}
+    <article class="post-entry featured-entry">
+      {{- partial "cover.html" (dict "cxt" . "IsSingle" false "isHidden" false) }}
+      <div class="featured-content">
+        <header class="entry-header"><h3>{{ .Title }}</h3></header>
+        <div class="entry-content"><p>{{ .Summary | plainify | htmlUnescape }}</p></div>
+        <footer class="entry-footer">{{ partial "post_meta.html" . }}</footer>
+      </div>
+      <a class="entry-link" aria-label="Read {{ .Title | plainify }}" href="{{ .RelPermalink }}"></a>
+    </article>
+    {{- end }}
+  </section>
+  {{- end }}
+</div>
+{{- end }}

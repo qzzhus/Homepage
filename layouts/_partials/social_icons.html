@@ -1,0 +1,7 @@
+<div class="social-icons" {{ with .align }}align="{{ . }}"{{ end }}>
+  {{- range hugo.Data.contact.social }}
+  <a href="{{ .url | safeURL }}" title="{{ .title | default .name }}" aria-label="{{ .title | default .name }}"{{ if not (hasPrefix .url "mailto:") }} target="_blank" rel="noopener noreferrer me"{{ end }}>
+    {{- partial "site_icon.html" . }}
+  </a>
+  {{- end }}
+</div>

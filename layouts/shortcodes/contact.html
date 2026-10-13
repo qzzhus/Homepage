@@ -1,0 +1,31 @@
+{{- /* All contact details are maintained in data/contact.yaml. */ -}}
+{{- $contact := hugo.Data.contact -}}
+{{- $isCV := eq (.Get "mode") "cv" -}}
+<div class="flex-container contact-block">
+  <div class="left">
+    <div class="contact-list">
+      <div class="contact-row">
+        {{- partial "site_icon.html" (dict "name" "domain") }}
+        <span class="contact-text">{{ $contact.affiliation }}</span>
+      </div>
+      <div class="contact-row">
+        {{- partial "site_icon.html" (dict "name" "location") }}
+        <span class="contact-text">{{ $contact.address }}</span>
+      </div>
+      {{- range $contact.social }}
+      {{- if or (not $isCV) .showInCV }}
+      <div class="contact-row">
+        {{- partial "site_icon.html" . }}
+        <span class="contact-text"><a href="{{ .url | safeURL }}">{{ .label }}</a>{{ with .suffix }}{{ . }}{{ end }}</span>
+      </div>
+      {{- end }}
+      {{- end }}
+    </div>
+  </div>
+  <div class="right">
+    <img class="contact-profile" src="{{ $contact.profile.image | relURL }}" alt="{{ $contact.profile.alt }}" width="160" height="160">
+    {{- if $isCV }}
+    <a id="download-btn" class="cv-download" href="{{ "downloads/curriculum-vitae.pdf" | relURL }}" download="Curriculum Vitae.pdf">Download PDF</a>
+    {{- end }}
+  </div>
+</div>

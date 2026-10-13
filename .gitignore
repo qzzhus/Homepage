@@ -16,3 +16,24 @@ _site/
 # counterproductive to check this file into the repository.
 # Details at https://github.com/github/pages-gem/issues/768
 Gemfile.lock
+
+# Hugo build output and cache
+/public/
+/resources/
+/.hugo_build.lock
+
+# Local previews, checks, and temporary dependencies
+/tmp/
+/out/
+/node_modules/
+/.venv/
+/venv/
+__pycache__/
+*.py[cod]
+
+# macOS and editor temporary files
+.DS_Store
+._*
+*~
+*.swp
+*.swo

@@ -1,0 +1,31 @@
+# Shared contact details for the homepage, About, and CV.
+# Keep the social entries in the order required on the homepage.
+affiliation: "Room 428, Institute for Solid State Physics, the University of Tokyo"
+address: "277-0882 Chiba, Kashiwa, Kashiwanoha, 5 Chome-1-5"
+profile:
+  image: "images/profile.png"
+  alt: "Profile image"
+social:
+  - name: arxiv
+    url: "https://arxiv.org/"
+    title: "arXiv"
+    label: "arXiv"
+  - name: school
+    url: "https://scholar.google.com/citations?user="
+    title: "Google Scholar"
+    label: "Google Scholar"
+    suffix: ""
+  - name: email
+    url: "mailto:qizhi@heptast.com"
+    title: "Email"
+    label: "qizhi@heptast.com"
+    showInCV: true
+  - name: github
+    url: "https://github.com/qzzhus"
+    title: "GitHub"
+    label: "GitHub @qzzhus"
+    showInCV: true
+  - name: x
+    url: "https://x.com/"
+    title: "X"
+    label: "@handle"

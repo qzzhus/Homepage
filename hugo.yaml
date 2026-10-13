@@ -1,0 +1,87 @@
+baseURL: "https://qzzhus.github.io/Homepage/"
+locale: "en-US"
+title: "QIZHI"
+theme: "PaperMod"
+buildFuture: true
+enableRobotsTXT: true
+outputs:
+  home: [HTML, RSS, JSON]
+ignoreFiles: ["\\.Rmd$", "\\.Rmarkdown$", "_cache$"]
+
+permalinks:
+  note: "/note/:year/:month/:day/:slug/"
+  post: "/post/:year/:month/:day/:slug/"
+
+menu:
+  main:
+    - identifier: posts
+      name: Posts
+      pageRef: /posts
+      weight: 20
+    - identifier: categories
+      name: Categories
+      pageRef: /categories
+      weight: 30
+    - identifier: search
+      name: Search
+      pageRef: /search
+      weight: 40
+    - identifier: about
+      name: About
+      pageRef: /about
+      weight: 50
+
+params:
+  author: "Qizhi"
+  description: "Qizhi's personal homepage, notes, and interactive simulations."
+  mainSections: ["posts"]
+  defaultTheme: auto
+  ShowReadingTime: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowToc: true
+  TocOpen: false
+  math: true
+  footer:
+    text: "[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)"
+  assets:
+    favicon: "images/hepta.svg"
+    favicon16x16: "images/favicon-16x16.png"
+    favicon32x32: "images/favicon-32x32.png"
+    apple_touch_icon: "images/apple-touch-icon.png"
+    safari_pinned_tab: "images/hepta.svg"
+  profileMode:
+    enabled: true
+    title: "Qizhi's Homepage"
+    subtitle: "Notes · Codes · Simulations"
+    imageUrl: "images/hepta.svg"
+    imageWidth: 150
+    imageHeight: 150
+    imageTitle: "Hepta"
+    buttons:
+      - name: About
+        url: about/
+      - name: CV
+        url: cv/
+      - name: Posts
+        url: posts/
+      - name: Simulations
+        url: categories/simulations/
+
+markup:
+  highlight:
+    codeFences: true
+    noClasses: false
+  goldmark:
+    renderer:
+      unsafe: true
+    extensions:
+      passthrough:
+        enable: true
+        delimiters:
+          block:
+            - ['\[', '\]']
+            - ['$$', '$$']
+          inline:
+            - ['\(', '\)']
